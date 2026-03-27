@@ -23,17 +23,13 @@ cp : Specific heat
 
 # == Die ==
 R_die   = 0.05
-W_diss  = 10
-l_die   = 30e-3
-w_die   = 20e-3
+W_diss  = 100
+l_die   = 10e-3 #30e-3
+w_die   = 10e-3 #20e-3
 
 # == PCB ==
 t_pcb   = 2e-3
 k_pcb   = 160
-
-# == TIM ==
-t_TIM   = 0.1e-3
-k_TIM   = 3
 
 # == Heatsink ==
 t_HS    = 6e-3
@@ -77,7 +73,6 @@ Deriving the thermal resistance
 A_die = l_die * w_die
 
 R_pcb   = t_pcb / (k_pcb * A_die)
-R_TIM   = t_TIM / (k_TIM * A_die)
 R_HS    = t_HS  / (k_HS  * A_die)
 
 """
@@ -124,8 +119,6 @@ parameters
 T_junc : Junction temperature in °C
 """
 
-# R_tot   = R_die + R_pcb + R_TIM + R_HS + R_conv
-# R_tot   = R_pcb + R_TIM + R_HS + R_conv
 R_tot   = R_pcb + R_HS + R_conv
 T_junc  = T_cl + (W_diss * R_tot)
 
@@ -162,9 +155,7 @@ Print statements
 print(f"{'Layer':<30} {'t [mm]':>8}  {'k [W/mK]':>9}  {'A [cm²]':>8}  {'R [K/W]':>9}  {'share':>6}")
 print("-" * 80)
 for name, t, k, A, R in [
-    ("Die",         None,   None,    None,   R_die   ),
     ("PCB",         t_pcb,  k_pcb,   A_die,  R_pcb   ),
-    ("TIM",         t_TIM,  k_TIM,   A_die,  R_TIM   ),
     ("Heatsink",    t_HS,   k_HS,    A_die,  R_HS    ),
     ("Convection",  None,   None,    A_conv, R_conv  ),
 ]:
