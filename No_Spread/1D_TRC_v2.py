@@ -23,7 +23,7 @@ cp : Specific heat
 
 # == Die ==
 R_die   = 0.05
-W_diss  = 150
+W_diss  = 10
 l_die   = 30e-3
 w_die   = 20e-3
 
@@ -42,13 +42,12 @@ k_HS    = 160
 l_ch    = l_die
 h_ch    = 10e-3
 w_ch    = 3e-3
-w_wall  = 1e-3       # wall thickness between channels [m] (unused for n_ch=1, kept for reference)
 
 # == Coolant ==
 T_cl        = 50
 glycol_pct  = 0
 
-# Glycol properties (constant — no T-dependent fit implemented yet)
+# Glycol properties
 rho_g   = 1060.0
 mu_g    = 1.4e-3
 cp_g    = 3500.0
@@ -103,20 +102,14 @@ Nu : Nusselt number
 h : heat transfer coefficient in W/m2K
 """
 
-# A_ch = w_ch * h_ch
-# P_ch = 2 * (w_ch + h_ch)
-# D_h  = 4 * A_ch / P_ch
-
 Re  = rho_f * u * l_ch / mu_f
 Pr   = (cp_f * mu_f) / k_f
 
 if Re < 5e5:
     Nu = ((0.3387*Pr**(1/3)*Re**(1/2))) / ((1+ (0.0468/Pr)**(2/3))**(1/4))
-    # Nu     = 0.664 * Re**(1/2) * Pr**(1/3)
     regime = "laminar"
 elif Re > 5e5:
-    Nu     = Pr**(1/3) * (0.037*Re**(4/5) - 871)
-    # Nu     = 0.0296 * Re**(4/5) * Pr**(1/3)     
+    Nu     = Pr**(1/3) * (0.037*Re**(4/5) - 871)    
     regime = "turbulent"
 
 h_cl    = 2 * Nu * k_f / l_ch
@@ -132,7 +125,8 @@ T_junc : Junction temperature in °C
 """
 
 # R_tot   = R_die + R_pcb + R_TIM + R_HS + R_conv
-R_tot   = R_pcb + R_TIM + R_HS + R_conv
+# R_tot   = R_pcb + R_TIM + R_HS + R_conv
+R_tot   = R_pcb + R_HS + R_conv
 T_junc  = T_cl + (W_diss * R_tot)
 
 """
@@ -192,10 +186,10 @@ print(f"f_D                 =   {f_D:.6f} [-]")
 print()
 print(f"System behavior:")
 print("-" * 80)
-print(f"T_cl                =   {T_cl:.1f} [°C]")
+print(f"T_cl                =   {T_cl:.3f} [°C]")
 print(f"Glycol percentage   =   {glycol_pct:.1f} [%]")
 print(f"Temperature rise    =   {W_diss * R_tot:.1f} [°C]")
-print(f"T_junc              =   {T_junc:.1f} [°C]")
+print(f"T_junc              =   {T_junc:.3f} [°C]")
 print(f"u                   =   {u:.4f} [m/s]")
 print(f"mass flow           =   {m_dot:.4f} [kg/s]")
 print(f"dP                  =   {dP_bar:.5f} [bar]")
