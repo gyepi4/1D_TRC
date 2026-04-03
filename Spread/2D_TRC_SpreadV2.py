@@ -30,7 +30,7 @@ w_die   = 10e-3
 # == Channel geometry ==
 l_ch    = l_HS          
 h_ch    = 10e-3
-w_ch    = 3e-3
+w_ch    = 1e-3
 
 # == Coolant ==
 T_cl        = 50
@@ -115,6 +115,7 @@ Spreading + conduction resistance (Lee et al., 1995)
 Sources
 -------
 Lee et al.
+Song et al.
 
 parameters
 ----------
@@ -131,6 +132,24 @@ Psi_avg     : dimensionless average spreading resistance [-]
 R_spread    : Spreading resistance [K/W]
 """
 
+# A_s     = A_die    
+# A_p     = l_HS * w_HS    
+
+# a       = np.sqrt(A_s / np.pi)     
+# b       = np.sqrt(A_p / np.pi)     
+
+# eps     = a / b                               
+# tau     = t_HS / b                
+# Bi      = h_cl * b / k_HS                   
+
+# lambda_c    = np.pi + (1.0 / (np.sqrt(np.pi) * eps))                            
+# Phi_c       = (np.tanh(lambda_c * tau) + (lambda_c / Bi)) / (1 + (lambda_c / Bi) * np.tanh(lambda_c * tau))                 
+
+# Psi_avg     = ((eps * tau) / np.sqrt(np.pi)) + 0.5 * (1 - eps)**(3/2) * Phi_c 
+# Psi_max     = ((eps * tau) / np.sqrt(np.pi)) + 0.5 * (1 - eps)**(1) * Phi_c 
+
+# R_spread    = Psi_max / (k_HS * np.sqrt(A_s))  
+
 A_s     = A_die    
 A_p     = l_HS * w_HS    
 
@@ -139,15 +158,18 @@ b       = np.sqrt(A_p / np.pi)
 
 eps     = a / b                               
 tau     = t_HS / b                
-Bi      = h_cl * b / k_HS                   
+Bi      = 1 / (np.pi * k_HS * b * R_conv)   # Eq. 9
 
-lambda_c    = np.pi + (1.0 / (np.sqrt(np.pi) * eps))                            
-Phi_c       = (np.tanh(lambda_c * tau) + (lambda_c / Bi)) / (1 + (lambda_c / Bi) * np.tanh(lambda_c * tau))                 
+lambda_c = np.pi + (1.0 / (np.sqrt(np.pi) * eps))            # Eq. 16
+Phi_c    = (np.tanh(lambda_c * tau) + (lambda_c / Bi)) / \
+           (1 + (lambda_c / Bi) * np.tanh(lambda_c * tau))   # Eq. 15
 
-Psi_avg     = ((eps * tau) / np.sqrt(np.pi)) + 0.5 * (1 - eps)**(3/2) * Phi_c 
-Psi_max     = ((eps * tau) / np.sqrt(np.pi)) + 0.5 * (1 - eps)**(1) * Phi_c 
+Psi_avg  = (eps * tau) / np.sqrt(np.pi) + \
+            0.5 * (1 - eps)**(3/2) * Phi_c                   # Eq. 13
+Psi_max  = (eps * tau) / np.sqrt(np.pi) + \
+            (1/np.sqrt(np.pi)) * (1 - eps) * Phi_c           # Eq. 14
 
-R_spread    = Psi_max / (k_HS * np.sqrt(A_s))  
+R_spread = Psi_max / (np.sqrt(np.pi) * k_HS * a)             # Eq. 18
 
 """
 Total thermal resistance and junction temperature
